@@ -3,15 +3,12 @@ import java.util.*;
 
 public class Encoder 
 {
-	final static int NUMBER_OF_CHARS = 26;
+	final static int NUMBER_OF_CHARS = 15;
 	private static int numberCharsToGenerate;
 	private static String frequenciesFileName;
 
-
-
 	public static void main(String[] args) throws IOException 
 	{
-		
 		validateArgs(args);
 		frequenciesFileName = args[0];
 		numberCharsToGenerate = Integer.parseInt(args[1]);
@@ -24,8 +21,6 @@ public class Encoder
 		
 		Map<String, Integer> oneCharFrequenciesMap = new HashMap<String, Integer>();
 		Map<String, Integer> twoCharFrequenciesMap = new HashMap<String, Integer>();
-
-		
 		Map<String, String> oneCharEncodingsMap = new HashMap<String, String>();
 		Map<String, String> twoCharEncodingsMap = new HashMap<String, String>();
 
@@ -35,16 +30,13 @@ public class Encoder
 		BufferedWriter bwEncoded2 = new BufferedWriter(new FileWriter("testText.enc2"));
 		BufferedWriter bwDecoded2 = new BufferedWriter(new FileWriter("testText.dec2"));
 
-		// read in the file of frequencies and populate the frequency array
 		try 
 		{
 			int oneCharSum = 0;
-			int twoCharSum = 0;
 			double entropySum = 0;
 			fillFrequencies(charFrequencies1);
 			fillTwoCharFrequencies(charFrequencies1, charFrequencies2);
 		    oneCharSum = sumOfArray(charFrequencies1);
-		    twoCharSum = sumOfArray(charFrequencies2);
 			entropySum = entropySumOfArray(charFrequencies1, oneCharSum);
 			
 			HuffmanTree oneCharTree = buildTree(charFrequencies1, oneCharFrequenciesMap, 1);
@@ -76,13 +68,11 @@ public class Encoder
 					+ ", average bits per symbol: " + average2);
 			System.out.println("Percentage increase from entropy = %"
 					+ (100 * (average2 - entropySum) / (entropySum)));
-
 		} 
 		catch (IOException e) 
 		{
 			e.printStackTrace();
 		}
-
 	}
 
 	public static void validateArgs(String[] args)
@@ -93,7 +83,6 @@ public class Encoder
 					+ "frequenciesFile: text file with integer weights of characters\n"
 					+ "k: number of characters to generate in random test text file");
 			System.exit(0);
-
 		}
 		if (!isInteger(args[1])) 
 		{
@@ -117,16 +106,14 @@ public class Encoder
 	
 	private static void fillCharArrays(String[] chars1, String[] chars2) 
 	{
-		for (int i = 0; i < chars1.length; i++) {
+		for (int i = 0; i < chars1.length; i++) 
+		{
 			chars1[i] = Character.toString((char) ('A' + i));
-		}
-		for (int i = 0; i < chars2.length; i++) {
-			chars2[i] = "";
 		}
 		for (int i = 0; i < chars2.length; i++) 
 		{
-			String s2 = Character.toString((char) ('A' + (i / 26)))
-					+ Character.toString((char) ('A' + (i % 26)));
+			String s2 = Character.toString((char) ('A' + (i / NUMBER_OF_CHARS)))
+					+ Character.toString((char) ('A' + (i % NUMBER_OF_CHARS)));
 			chars2[i] = s2;
 		}
 	}
@@ -137,9 +124,8 @@ public class Encoder
 		System.out.println("Reading from file: " + frequenciesFileName);
 
 		int i = 0;
-		int sum = 0;
 		String line;
-		while ((line = br.readLine()) != null) 
+		while ((line = br.readLine()) != null && i < NUMBER_OF_CHARS) 
 		{
 			if (line.equals("") || !isInteger(line)) 
 			{
@@ -157,7 +143,7 @@ public class Encoder
 		{
 			for (int k = 0; k < charFrequencies1.length; k++) 
 			{
-				charFrequencies2[(j * 26) + k] = charFrequencies1[j] * charFrequencies1[k];
+				charFrequencies2[(j * NUMBER_OF_CHARS) + k] = charFrequencies1[j] * charFrequencies1[k];
 			}
 		}
 	}
@@ -186,7 +172,6 @@ public class Encoder
 		return entropySum;
 	}
 
-	// input is an array of frequencies, indexed by character code
 	public static HuffmanTree buildTree(int[] charFrequencies,
 			Map<String, Integer> charFrequenciesMap, int j) 
 	{
@@ -203,15 +188,14 @@ public class Encoder
 				}
 			}
 		}
-
 		else if (j == 2)
 		{
 			for (int i = 0; i < charFrequencies.length; i++) 
 			{
 				if (charFrequencies[i] > 0) 
 				{
-					String string = Character.toString((char) ('A' + (i / 26)))
-							+ Character.toString((char) ('A' + (i % 26)));
+					String string = Character.toString((char) ('A' + (i / NUMBER_OF_CHARS)))
+							+ Character.toString((char) ('A' + (i % NUMBER_OF_CHARS)));
 					trees.offer(new HuffmanLeaf(charFrequencies[i], string));
 					charFrequenciesMap.put(string, i);
 				}
@@ -334,7 +318,7 @@ public class Encoder
 		brDecoded.close();
 	}
 
-	static double log2(double x) 
+	public static double log2(double x) 
 	{
 		return Math.log(x) / Math.log(2.0d);
 	}
